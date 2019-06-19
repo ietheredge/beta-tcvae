@@ -69,9 +69,9 @@ class ConvEncoder(nn.Module):
 
         self.conv_2 = nn.Conv2d(3, 32, 4, 2, 1)  # 128 x 128
         self.bn_2 = nn.BatchNorm2d(32)
-        self.conv_1 = nn.Conv2d(3, 32, 4, 2, 1)  # 64 x 64
+        self.conv_1 = nn.Conv2d(32, 32, 4, 2, 1)  # 64 x 64
         self.bn_1 = nn.BatchNorm2d(32)
-        self.conv1 = nn.Conv2d(3, 32, 4, 2, 1)  # 32 x 32
+        self.conv1 = nn.Conv2d(32, 32, 4, 2, 1)  # 32 x 32
         self.bn1 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 32, 4, 2, 1)  # 16 x 16
         self.bn2 = nn.BatchNorm2d(32)
