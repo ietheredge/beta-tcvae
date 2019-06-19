@@ -253,7 +253,7 @@ def plot_vs_gt_guppies(vae, faces_dataset, save, z_inds=None):
         qz_params[n:n + batch_size] = vae.encoder.forward(xs).view(batch_size, vae.z_dim, nparams).data
         n += batch_size
     
-    print(qz_params)
+    print(qz_params.shape)
 
     qz_params = qz_params.view(50, 21, 11, 11, K, nparams)
 
