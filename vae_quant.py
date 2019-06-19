@@ -181,7 +181,7 @@ class VAE(nn.Module):
         return zs, z_params
 
     def decode(self, z):
-        x_params = self.decoder.forward(z).view(z.size(0), x.size(1), x.size(2), x.size(3))
+        x_params = self.decoder.forward(z).view(z.size(0), 3, 256, 256)
         xs = self.x_dist.sample(params=x_params)
         return xs, x_params
 
