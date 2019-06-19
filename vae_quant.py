@@ -67,7 +67,7 @@ class ConvEncoder(nn.Module):
         super(ConvEncoder, self).__init__()
         self.output_dim = output_dim
 
-        self.conv1 = nn.Conv2d(1, 32, 4, 2, 1)  # 32 x 32
+        self.conv1 = nn.Conv2d(3, 32, 4, 2, 1)  # 32 x 32
         self.bn1 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 32, 4, 2, 1)  # 16 x 16
         self.bn2 = nn.BatchNorm2d(32)
@@ -106,7 +106,7 @@ class ConvDecoder(nn.Module):
         self.bn4 = nn.BatchNorm2d(32)
         self.conv5 = nn.ConvTranspose2d(32, 32, 4, 2, 1)  # 32 x 32
         self.bn5 = nn.BatchNorm2d(32)
-        self.conv_final = nn.ConvTranspose2d(32, 1, 4, 2, 1)
+        self.conv_final = nn.ConvTranspose2d(32, 3, 4, 2, 1)
 
         # setup the non-linearity
         self.act = nn.ReLU(inplace=True)
