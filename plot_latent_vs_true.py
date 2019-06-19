@@ -220,59 +220,59 @@ def plot_vs_gt_guppies(vae, faces_dataset, save, z_inds=None):
         z_inds = active_units
 
     # subplots where subplot[i, j] is gt_i vs. z_j
-    mean_pose_az = qz_means.mean(3).mean(2).mean(0)  # (pose_az, latent)
-    mean_pose_el = qz_means.mean(3).mean(1).mean(0)  # (pose_el, latent)
-    mean_light_az = qz_means.mean(2).mean(1).mean(0)  # (light_az, latent)
+    # mean_pose_az = qz_means.mean(3).mean(2).mean(0)  # (pose_az, latent)
+    # mean_pose_el = qz_means.mean(3).mean(1).mean(0)  # (pose_el, latent)
+    # mean_light_az = qz_means.mean(2).mean(1).mean(0)  # (light_az, latent)
 
-    fig = plt.figure(figsize=(len(z_inds), 3))  # default is (8,6)
-    gs = gridspec.GridSpec(3, len(z_inds))
-    gs.update(wspace=0, hspace=0)  # set the spacing between axes.
+    # fig = plt.figure(figsize=(len(z_inds), 3))  # default is (8,6)
+    # gs = gridspec.GridSpec(3, len(z_inds))
+    # gs.update(wspace=0, hspace=0)  # set the spacing between axes.
 
-    vmin_scale = torch.min(mean_pose_az)
-    vmax_scale = torch.max(mean_pose_az)
-    for i, j in enumerate(z_inds):
-        ax = fig.add_subplot(gs[i])
-        ax.plot(mean_pose_az[:, j].numpy())
-        ax.set_ylim([vmin_scale, vmax_scale])
-        ax.set_xticks([])
-        ax.set_yticks([])
-        x0, x1 = ax.get_xlim()
-        y0, y1 = ax.get_ylim()
-        ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-        if i == 0:
-            ax.set_ylabel(r'azimuth')
+    # vmin_scale = torch.min(mean_pose_az)
+    # vmax_scale = torch.max(mean_pose_az)
+    # for i, j in enumerate(z_inds):
+    #     ax = fig.add_subplot(gs[i])
+    #     ax.plot(mean_pose_az[:, j].numpy())
+    #     ax.set_ylim([vmin_scale, vmax_scale])
+    #     ax.set_xticks([])
+    #     ax.set_yticks([])
+    #     x0, x1 = ax.get_xlim()
+    #     y0, y1 = ax.get_ylim()
+    #     ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+    #     if i == 0:
+    #         ax.set_ylabel(r'azimuth')
 
-    vmin_scale = torch.min(mean_pose_el)
-    vmax_scale = torch.max(mean_pose_el)
-    for i, j in enumerate(z_inds):
-        ax = fig.add_subplot(gs[len(z_inds) + i])
-        ax.plot(mean_pose_el[:, j].numpy())
-        ax.set_ylim([vmin_scale, vmax_scale])
-        ax.set_xticks([])
-        ax.set_yticks([])
-        x0, x1 = ax.get_xlim()
-        y0, y1 = ax.get_ylim()
-        ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-        if i == 0:
-            ax.set_ylabel(r'elevation')
+    # vmin_scale = torch.min(mean_pose_el)
+    # vmax_scale = torch.max(mean_pose_el)
+    # for i, j in enumerate(z_inds):
+    #     ax = fig.add_subplot(gs[len(z_inds) + i])
+    #     ax.plot(mean_pose_el[:, j].numpy())
+    #     ax.set_ylim([vmin_scale, vmax_scale])
+    #     ax.set_xticks([])
+    #     ax.set_yticks([])
+    #     x0, x1 = ax.get_xlim()
+    #     y0, y1 = ax.get_ylim()
+    #     ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+    #     if i == 0:
+    #         ax.set_ylabel(r'elevation')
 
-    vmin_scale = torch.min(mean_light_az)
-    vmax_scale = torch.max(mean_light_az)
-    for i, j in enumerate(z_inds):
-        ax = fig.add_subplot(gs[2 * len(z_inds) + i])
-        ax.plot(mean_light_az[:, j].numpy())
-        ax.set_ylim([vmin_scale, vmax_scale])
-        ax.set_xticks([])
-        ax.set_yticks([])
-        x0, x1 = ax.get_xlim()
-        y0, y1 = ax.get_ylim()
-        ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-        if i == 0:
-            ax.set_ylabel(r'lighting')
+    # vmin_scale = torch.min(mean_light_az)
+    # vmax_scale = torch.max(mean_light_az)
+    # for i, j in enumerate(z_inds):
+    #     ax = fig.add_subplot(gs[2 * len(z_inds) + i])
+    #     ax.plot(mean_light_az[:, j].numpy())
+    #     ax.set_ylim([vmin_scale, vmax_scale])
+    #     ax.set_xticks([])
+    #     ax.set_yticks([])
+    #     x0, x1 = ax.get_xlim()
+    #     y0, y1 = ax.get_ylim()
+    #     ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+    #     if i == 0:
+    #         ax.set_ylabel(r'lighting')
 
-    plt.suptitle('GT Factors vs. Latent Variables')
-    plt.savefig(save)
-    plt.close()
+    # plt.suptitle('GT Factors vs. Latent Variables')
+    # plt.savefig(save)
+    # plt.close()
 
 if __name__ == '__main__':
     import argparse
