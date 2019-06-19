@@ -190,7 +190,7 @@ def plot_vs_gt_faces(vae, faces_dataset, save, z_inds=None):
     plt.close()
 
 def plot_vs_gt_guppies(vae, faces_dataset, save, z_inds=None):
-    dataset_loader = DataLoader(faces_dataset, batch_size=1000, num_workers=1, shuffle=False)
+    dataset_loader = DataLoader(faces_dataset, batch_size=1000, num_workers=10, shuffle=False)
 
     N = len(dataset_loader.dataset)  # number of data samples
     K = vae.z_dim                    # number of latent variables
