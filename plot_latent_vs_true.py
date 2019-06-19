@@ -207,9 +207,9 @@ def plot_vs_gt_guppies(vae, faces_dataset, save, z_inds=None):
         qz_params[n:n + batch_size] = vae.encoder.forward(xs).view(batch_size, vae.z_dim, nparams).data
         n += batch_size
 
-    qz_params = qz_params.view(3, 6, 40, 32, 32, K, nparams)
+    #qz_params = qz_params.view(3, 6, 40, 32, 32, K, nparams)
     # z_j is inactive if Var_x(E[z_j|x]) < eps.
-    qz_means = qz_params[:, :, :, :, :, :, 0]
+    qz_means = qz_params[:, :, 0]
     var = torch.std(qz_means.contiguous().view(N, K), dim=0).pow(2)
     active_units = torch.arange(0, K)[var > VAR_THRESHOLD].long()
     print('Active units: ' + ','.join(map(str, active_units.tolist())))
