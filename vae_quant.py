@@ -67,11 +67,7 @@ class ConvEncoder(nn.Module):
         super(ConvEncoder, self).__init__()
         self.output_dim = output_dim
 
-        self.conv_2 = nn.Conv2d(3, 32, 4, 2, 1)  # 128 x 128
-        self.bn_2 = nn.BatchNorm2d(32)
-        self.conv_1 = nn.Conv2d(32, 32, 4, 2, 1)  # 64 x 64
-        self.bn_1 = nn.BatchNorm2d(32)
-        self.conv1 = nn.Conv2d(32, 32, 4, 2, 1)  # 32 x 32
+        self.conv1 = nn.Conv2d(3, 32, 4, 2, 1)  # 32 x 32
         self.bn1 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 32, 4, 2, 1)  # 16 x 16
         self.bn2 = nn.BatchNorm2d(32)
@@ -79,7 +75,7 @@ class ConvEncoder(nn.Module):
         self.bn3 = nn.BatchNorm2d(64)
         self.conv4 = nn.Conv2d(64, 64, 4, 2, 1)  # 4 x 4
         self.bn4 = nn.BatchNorm2d(64)
-        self.conv5 = nn.Conv2d(64, 512, 4)
+        self.conv5 = nn.Conv2d(64, 512, 16)
         self.bn5 = nn.BatchNorm2d(512)
         self.conv_z = nn.Conv2d(512, output_dim, 1)
 
@@ -88,8 +84,6 @@ class ConvEncoder(nn.Module):
 
     def forward(self, x):
         h = x.view(-1, x.size(1), x.size(2), x.size(3))
-        h = self.act(self.bn_2(self.conv_2(h)))
-        h = self.act(self.bn_1(self.conv_1(h)))
         h = self.act(self.bn1(self.conv1(h)))
         h = self.act(self.bn2(self.conv2(h)))
         h = self.act(self.bn3(self.conv3(h)))
@@ -112,12 +106,6 @@ class ConvDecoder(nn.Module):
         self.bn4 = nn.BatchNorm2d(32)
         self.conv5 = nn.ConvTranspose2d(32, 32, 4, 2, 1)  # 32 x 32
         self.bn5 = nn.BatchNorm2d(32)
-
-        self.conv6 = nn.ConvTranspose2d(32, 32, 4, 2, 1)  # 64 x 64
-        self.bn6 = nn.BatchNorm2d(32)
-        self.conv7 = nn.ConvTranspose2d(32, 32, 4, 2, 1)  # 128 x 128
-        self.bn7 = nn.BatchNorm2d(32)
-
         self.conv_final = nn.ConvTranspose2d(32, 3, 4, 2, 1)
 
         # setup the non-linearity
@@ -130,8 +118,6 @@ class ConvDecoder(nn.Module):
         h = self.act(self.bn3(self.conv3(h)))
         h = self.act(self.bn4(self.conv4(h)))
         h = self.act(self.bn5(self.conv5(h)))
-        h = self.act(self.bn6(self.conv6(h)))
-        h = self.act(self.bn7(self.conv7(h)))
         mu_img = self.conv_final(h)
         return mu_img
 
