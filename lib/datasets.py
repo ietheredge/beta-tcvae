@@ -44,15 +44,17 @@ class Faces(Dataset):
         return super(Faces, self).__init__(self.LOC)
 
 
-class Guppies(Dataset):
+class Guppies(object):
 
     def __init__(self, dataset_zip=None):
         loc = 'data/guppies.npy'
         if dataset_zip is None:
-                self.dataset_zip = np.load(loc)
+                self.dataset_zip = np.load(loc, encoding='latin1')
         else:
             self.dataset_zip = dataset_zip
         self.imgs = torch.from_numpy(self.dataset_zip['x_train']).float()
+        print(self.imgs.size)
+
 
     def __len__(self):
         return self.imgs.size(0)
