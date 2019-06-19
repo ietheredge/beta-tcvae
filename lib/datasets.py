@@ -44,7 +44,7 @@ class Faces(Dataset):
         return super(Faces, self).__init__(self.LOC)
 
 
-class Guppies(Dataset, dataset_zip=None):
+class Guppies(Dataset):
 
     def __init__(self, dataset_zip=None):
         loc = 'data/guppies.npy'
