@@ -61,5 +61,5 @@ class Guppies(object):
         return self.imgs.size(0)
 
     def __getitem__(self, index):
-        x = self.imgs[index].view(256, 256, 3).permute()
+        x = self.imgs[index].view(256, 256, 3).permute(2, 0, 1)
         return x
