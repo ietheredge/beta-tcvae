@@ -58,7 +58,7 @@ class MLPDecoder(nn.Module):
     def forward(self, z):
         h = z.view(z.size(0), -1)
         h = self.net(h)
-        mu_img = h.view(z.size(0), 1, 64, 64)
+        mu_img = h.view(z.size(0), x.size(1), x.size(2), x.size(3))
         return mu_img
 
 
@@ -83,7 +83,7 @@ class ConvEncoder(nn.Module):
         self.act = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        h = x.view(-1, 1, 64, 64)
+        h = x.view(-1, x.size(1), x.size(2), x.size(3))
         h = self.act(self.bn1(self.conv1(h)))
         h = self.act(self.bn2(self.conv2(h)))
         h = self.act(self.bn3(self.conv3(h)))
@@ -173,7 +173,7 @@ class VAE(nn.Module):
 
     # define the guide (i.e. variational distribution) q(z|x)
     def encode(self, x):
-        x = x.view(x.size(0), 1, 64, 64)
+        x = x.view(x.size(0), x.size(1), x.size(2), x.size(3))
         # use the encoder to get the parameters used to define q(z|x)
         z_params = self.encoder.forward(x).view(x.size(0), self.z_dim, self.q_dist.nparams)
         # sample the latent code z
@@ -181,7 +181,7 @@ class VAE(nn.Module):
         return zs, z_params
 
     def decode(self, z):
-        x_params = self.decoder.forward(z).view(z.size(0), 1, 64, 64)
+        x_params = self.decoder.forward(z).view(z.size(0), x.size(1), x.size(2), x.size(3))
         xs = self.x_dist.sample(params=x_params)
         return xs, x_params
 
@@ -308,7 +308,7 @@ def display_samples(model, x, vis):
     # plot random samples
     sample_mu = model.model_sample(batch_size=100).sigmoid()
     sample_mu = sample_mu
-    images = list(sample_mu.view(-1, 1, 64, 64).data.cpu())
+    images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
     win_samples = vis.images(images, 10, 2, opts={'caption': 'samples'}, win=win_samples)
 
     # plot the reconstructed distribution for the first 50 test images
@@ -316,9 +316,9 @@ def display_samples(model, x, vis):
     _, reco_imgs, zs, _ = model.reconstruct_img(test_imgs)
     reco_imgs = reco_imgs.sigmoid()
     test_reco_imgs = torch.cat([
-        test_imgs.view(1, -1, 64, 64), reco_imgs.view(1, -1, 64, 64)], 0).transpose(0, 1)
+        test_imgs.view(x.size(1), -1, x.size(2), x.size(3)), reco_imgs.view(x.size(1), -1, x.size(2), x.size(3))], 0).transpose(0, 1)
     win_test_reco = vis.images(
-        list(test_reco_imgs.contiguous().view(-1, 1, 64, 64).data.cpu()), 10, 2,
+        list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu()), 10, 2,
         opts={'caption': 'test reconstruction image'}, win=win_test_reco)
 
     # plot latent walks (change one variable while all others stay the same)
