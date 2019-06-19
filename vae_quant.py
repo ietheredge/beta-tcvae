@@ -77,7 +77,7 @@ class ConvEncoder(nn.Module):
         self.bn4 = nn.BatchNorm2d(64)
         self.conv5 = nn.Conv2d(64, 512, 4)
         self.bn5 = nn.BatchNorm2d(512)
-        self.conv_z = nn.Conv2d(512, output_dim, 1)
+        self.conv_z = nn.Conv2d(512, output_dim, 3)
 
         # setup the non-linearity
         self.act = nn.ReLU(inplace=True)
