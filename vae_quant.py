@@ -286,7 +286,7 @@ def setup_data_loaders(args, use_cuda=False):
     elif args.dataset == 'faces':
         train_set = dset.Faces()
     elif args.dataset == 'guppies':
-        train_set = dset.Faces()
+        train_set = dset.Guppies()
     else:
         raise ValueError('Unknown dataset ' + str(args.dataset))
 
@@ -350,6 +350,8 @@ def anneal_kl(args, vae, iteration):
         warmup_iter = 7000
     elif args.dataset == 'faces':
         warmup_iter = 2500
+    elif args.dataset == 'guppies':
+        warmup_iter = 1000
 
     if args.lambda_anneal:
         vae.lamb = max(0, 0.95 - 1 / warmup_iter * iteration)  # 1 --> 0
