@@ -415,7 +415,7 @@ def main():
     train_elbo = []
 
     # training loop
-    dataset_size = len(train_loaderz.dataset)
+    dataset_size = len(train_loader.dataset)
     num_iterations = len(train_loader) * args.num_epochs
     iteration = 0
     # initialize loss accumulator
