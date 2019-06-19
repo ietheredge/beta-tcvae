@@ -34,7 +34,7 @@ class MLPEncoder(nn.Module):
         self.act = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        h = x.view(-1, 64 * 64)
+        h = x.view(-1, x.size(1) * x.size(2) * x.size(3))
         h = self.act(self.fc1(h))
         h = self.act(self.fc2(h))
         h = self.fc3(h)
@@ -58,7 +58,7 @@ class MLPDecoder(nn.Module):
     def forward(self, z):
         h = z.view(z.size(0), -1)
         h = self.net(h)
-        mu_img = h.view(z.size(0), x.size(1), x.size(2), x.size(3))
+        mu_img = h.view(z.size(0), 3, 256, 256)
         return mu_img
 
 
@@ -75,7 +75,7 @@ class ConvEncoder(nn.Module):
         self.bn3 = nn.BatchNorm2d(64)
         self.conv4 = nn.Conv2d(64, 64, 4, 2, 1)  # 4 x 4
         self.bn4 = nn.BatchNorm2d(64)
-        self.conv5 = nn.Conv2d(64, 512, 4)
+        self.conv5 = nn.Conv2d(64, 512, 16)
         self.bn5 = nn.BatchNorm2d(512)
         self.conv_z = nn.Conv2d(512, output_dim, 1)
 
@@ -98,7 +98,7 @@ class ConvDecoder(nn.Module):
         super(ConvDecoder, self).__init__()
         self.conv1 = nn.ConvTranspose2d(input_dim, 512, 1, 1, 0)  # 1 x 1
         self.bn1 = nn.BatchNorm2d(512)
-        self.conv2 = nn.ConvTranspose2d(512, 64, 4, 1, 0)  # 4 x 4
+        self.conv2 = nn.ConvTranspose2d(512, 64, 16, 1, 0)  # 4 x 4
         self.bn2 = nn.BatchNorm2d(64)
         self.conv3 = nn.ConvTranspose2d(64, 64, 4, 2, 1)  # 8 x 8
         self.bn3 = nn.BatchNorm2d(64)
