@@ -52,6 +52,7 @@ class Guppies(object):
                 self.dataset_zip = np.load(loc, encoding='latin1')
         else:
             self.dataset_zip = dataset_zip
+        print(self.dataset_zip['x_train'].shape)
         self.imgs = torch.from_numpy(self.dataset_zip['x_train']).float()
         print(self.imgs.size)
 
