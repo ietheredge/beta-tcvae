@@ -98,7 +98,7 @@ class ConvDecoder(nn.Module):
         super(ConvDecoder, self).__init__()
         self.conv1 = nn.ConvTranspose2d(input_dim, 512, 1, 1, 0)  # 1 x 1
         self.bn1 = nn.BatchNorm2d(512)
-        self.conv2 = nn.ConvTranspose2d(512, 64, 4, 1, 0)  # 4 x 4
+        self.conv2 = nn.ConvTranspose2d(512, 64, 16, 1, 0)  # 4 x 4
         self.bn2 = nn.BatchNorm2d(64)
         self.conv3 = nn.ConvTranspose2d(64, 64, 4, 2, 1)  # 8 x 8
         self.bn3 = nn.BatchNorm2d(64)
