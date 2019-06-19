@@ -204,7 +204,7 @@ class VAE(nn.Module):
     def elbo(self, x, dataset_size):
         # log p(x|z) + log p(z) - log q(z|x)
         batch_size = x.size(0)
-        x = x.view(batch_size, x.size(1:)
+        x = x.view(batch_size, [x.size(1), x.size(2), x.size(3)])
         prior_params = self._get_prior_params(batch_size)
         x_recon, x_params, zs, z_params = self.reconstruct_img(x)
         logpx = self.x_dist.log_density(x, params=x_params).view(batch_size, -1).sum(1)
