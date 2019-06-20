@@ -203,7 +203,8 @@ def plot_vs_gt_guppies(vae, faces_dataset, save, z_inds=None):
     n = 0
     for xs in dataset_loader:
         batch_size = xs.size(0)
-        xs = Variable(xs.view(batch_size, xs.size(1), xs.size(2), xs.size(3)).cuda(), volatile=True)
+        with torch.no_grad():
+            xs = Variable(xs.view(batch_size, xs.size(1), xs.size(2), xs.size(3)).cuda())
         qz_params[n:n + batch_size] = vae.encoder.forward(xs).view(batch_size, vae.z_dim, nparams).data
         n += batch_size
 
