@@ -436,7 +436,7 @@ def main():
             if utils.isnan(obj).any():
                 raise ValueError('NaN spotted in objective.')
             obj.mean().mul(-1).backward()
-            elbo_running_mean.update(elbo.mean().data)
+            elbo_running_mean.update(elbo.mean().data.detach())
             optimizer.step()
 
             # report training diagnostics
