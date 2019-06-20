@@ -460,7 +460,7 @@ def main():
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
 
-    del train_elbo, elbo_running_mean, obj, elbo 
+    del train_elbo, elbo_running_mean, obj, elbo
     gc.collect()
 
     # Report statistics after training
