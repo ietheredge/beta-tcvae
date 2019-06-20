@@ -436,7 +436,7 @@ def main():
             if utils.isnan(obj).any():
                 raise ValueError('NaN spotted in objective.')
             obj.mean().mul(-1).backward()
-            elbo_running_mean.update(elbo.mean().data.detach())
+            elbo_running_mean.update(elbo.mean().data)
             optimizer.step()
 
             # report training diagnostics
@@ -464,7 +464,7 @@ def main():
     utils.save_checkpoint({
         'state_dict': vae.state_dict(),
         'args': args}, args.save, 0)
-    dataset_loader = DataLoader(train_loader.dataset, batch_size=1000, num_workers=1, shuffle=False)
+    dataset_loader = DataLoader(train_loader.dataset, batch_size=args.batch_size, num_workers=1, shuffle=False)
     logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
         elbo_decomposition(vae, dataset_loader)
     torch.save({
