@@ -11,6 +11,9 @@ import visdom
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+
 import lib.dist as dist
 import lib.utils as utils
 import lib.datasets as dset
@@ -303,32 +306,91 @@ win_latent_walk = None
 win_train_elbo = None
 
 
-def display_samples(model, x, vis):
-    global win_samples, win_test_reco, win_latent_walk
+# def display_samples(model, x, vis):
+#     global win_samples, win_test_reco, win_latent_walk
+
+#     # plot random samples
+#     sample_mu = model.model_sample(batch_size=100).sigmoid()
+#     sample_mu = sample_mu
+#     images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
+#     win_samples = vis.images(images, 10, 2, opts={'caption': 'samples'}, win=win_samples)
+
+#     # plot the reconstructed distribution for the first 50 test images
+#     test_imgs = x[:50, :]
+#     _, reco_imgs, zs, _ = model.reconstruct_img(test_imgs)
+#     reco_imgs = reco_imgs.sigmoid()
+#     test_reco_imgs = torch.cat([
+#         test_imgs.view(x.size(1), -1, x.size(2), x.size(3)), reco_imgs.view(x.size(1), -1, x.size(2), x.size(3))], 0).transpose(0, 1)
+#     win_test_reco = vis.images(
+#         list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu()), 10, 2,
+#         opts={'caption': 'test reconstruction image'}, win=win_test_reco)
+
+#     # plot latent walks (change one variable while all others stay the same)
+#     zs = zs[0:3]
+#     batch_size, z_dim = zs.size()
+#     xs = []
+#     delta = torch.autograd.Variable(torch.linspace(-2, 2, 7), volatile=True).type_as(zs)
+#     for i in range(z_dim):
+#         vec = Variable(torch.zeros(z_dim)).view(1, z_dim).expand(7, z_dim).contiguous().type_as(zs)
+#         vec[:, i] = 1
+#         vec = vec * delta[:, None]
+#         zs_delta = zs.clone().view(batch_size, 1, z_dim)
+#         zs_delta[:, :, i] = 0
+#         zs_walk = zs_delta + vec[None]
+#         xs_walk = model.decoder.forward(zs_walk.view(-1, z_dim)).sigmoid()
+#         xs.append(xs_walk)
+
+#     xs = list(torch.cat(xs, 0).data.cpu())
+#     win_latent_walk = vis.images(xs, 7, 2, opts={'caption': 'latent walk'}, win=win_latent_walk)
+
+def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_trv_val=-2, max_trv_val=2):
+#     global win_samples, win_test_reco, win_latent_walk
 
     # plot random samples
     sample_mu = model.model_sample(batch_size=100).sigmoid()
     sample_mu = sample_mu
     images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
-    win_samples = vis.images(images, 10, 2, opts={'caption': 'samples'}, win=win_samples)
+    
+    plt.figure(figsize = (10,10))
+    gs1 = gridspec.GridSpec(10, 10)
+    gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
+    for i, image in enumerate(images):
+       # i = i + 1 # grid spec indexes from 0
+        ax1 = plt.subplot(gs1[i])
+        ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
+        plt.axis('off')
+        ax1.set_aspect('equal')
+    fig = plt.gcf()
+    fig.savefig(os.path.join(save, 'samples_{}.png'.format(epoch)), dpi=300)
 
     # plot the reconstructed distribution for the first 50 test images
     test_imgs = x[:50, :]
     _, reco_imgs, zs, _ = model.reconstruct_img(test_imgs)
     reco_imgs = reco_imgs.sigmoid()
     test_reco_imgs = torch.cat([
-        test_imgs.view(x.size(1), -1, x.size(2), x.size(3)), reco_imgs.view(x.size(1), -1, x.size(2), x.size(3))], 0).transpose(0, 1)
-    win_test_reco = vis.images(
-        list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu()), 10, 2,
-        opts={'caption': 'test reconstruction image'}, win=win_test_reco)
-
+        test_imgs.view(-1, x.size(1),  x.size(2), x.size(3)), reco_imgs.view(-1, x.size(1),  x.size(2), x.size(3))], 1)
+    test_reco_imgs = list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
+    
+    plt.figure(figsize = (10, 10))
+    gs1 = gridspec.GridSpec(10, 10)
+    gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
+    for i, image in enumerate(test_reco_imgs):
+       # i = i + 1 # grid spec indexes from 0
+        ax1 = plt.subplot(gs1[i])
+        ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
+        plt.axis('off')
+        ax1.set_aspect('equal')
+    fig = plt.gcf()
+    fig.savefig(os.path.join(save, 'reconstruction_{}.png'.format(epoch)), dpi=300)
+    
     # plot latent walks (change one variable while all others stay the same)
-    zs = zs[0:3]
+    zs = zs[0:n_trv_exmp]
     batch_size, z_dim = zs.size()
     xs = []
-    delta = torch.autograd.Variable(torch.linspace(-2, 2, 7), volatile=True).type_as(zs)
+    with torch.no_grad():
+        delta = torch.autograd.Variable(torch.linspace(min_trv_val, max_trv_val, n_trv_stps)).type_as(zs)
     for i in range(z_dim):
-        vec = Variable(torch.zeros(z_dim)).view(1, z_dim).expand(7, z_dim).contiguous().type_as(zs)
+        vec = Variable(torch.zeros(z_dim)).view(1, z_dim).expand(n_trv_stps, z_dim).contiguous().type_as(zs)
         vec[:, i] = 1
         vec = vec * delta[:, None]
         zs_delta = zs.clone().view(batch_size, 1, z_dim)
@@ -338,12 +400,32 @@ def display_samples(model, x, vis):
         xs.append(xs_walk)
 
     xs = list(torch.cat(xs, 0).data.cpu())
-    win_latent_walk = vis.images(xs, 7, 2, opts={'caption': 'latent walk'}, win=win_latent_walk)
+    print(len(xs))
+    plt.figure(figsize = (n_trv_stps, n_trv_exmp * z_dim))
+    gs1 = gridspec.GridSpec(n_trv_exmp * z_dim, n_trv_stps)
+    gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
+
+    for i, image in enumerate(xs):
+       # i = i + 1 # grid spec indexes from 0
+        ax1 = plt.subplot(gs1[i])
+        ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
+        plt.axis('off')
+        ax1.set_aspect('equal')
+    fig = plt.gcf()
+    fig.savefig(os.path.join(save, 'traversal_{}.png'.format(epoch)), dpi=300)
 
 
-def plot_elbo(train_elbo, vis):
-    global win_train_elbo
-    win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
+
+# def plot_elbo(train_elbo, vis):
+#     global win_train_elbo
+#     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
+
+def plot_elbo(train_elbo):
+    plt.plot(train_elbo.detach().cpu().numpy())
+    fig = plt.gcf()
+    fig.savefig('data/training_output/elbo_{}.pdf'.format(epch), dpi=300)
+
+
 
 
 def anneal_kl(args, vae, iteration):
@@ -421,7 +503,7 @@ def main():
     iteration = 0
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
-    while iteration < num_iterations:
+    while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
             iteration += 1
             batch_time = time.time()
@@ -451,23 +533,21 @@ def main():
 
                 # plot training and test ELBOs
                 if args.visdom:
-                    display_samples(vae, x, vis)
-                    plot_elbo(train_elbo, vis)
+                    display_samples(vae, x, iteration, args.save)
+                    plot_elbo(train_elbo, args.save)
 
                 utils.save_checkpoint({
                     'state_dict': vae.state_dict(),
-                    'args': args}, args.save, 0)
+                    'args': args}, args.save, iteration)
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
     
-    del train_elbo, elbo_running_mean, obj, elbo, 
-    gc.collect()
     
     # Report statistics after training
     vae.eval()
     utils.save_checkpoint({
         'state_dict': vae.state_dict(),
-        'args': args}, args.save, 0)
+        'args': args}, args.save, iteration)
     dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
     logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
         elbo_decomposition(vae, dataset_loader)
@@ -478,7 +558,8 @@ def main():
         'dimwise_kl': dimwise_kl,
         'analytical_cond_kl': analytical_cond_kl,
         'marginal_entropies': marginal_entropies,
-        'joint_entropy': joint_entropy
+        'joint_entropy': joint_entropy,
+        'train_elbo': train_elbo,
     }, os.path.join(args.save, 'elbo_decomposition.pth'))
     eval('plot_vs_gt_' + args.dataset)(vae, dataset_loader.dataset, os.path.join(args.save, 'gt_vs_latent.png'))
     return vae
