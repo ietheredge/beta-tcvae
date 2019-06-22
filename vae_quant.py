@@ -439,7 +439,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 def plot_elbo(train_elbo, save, epoch):
     plt.figure(figsize=(10, 10))
-    plt.plot(train_elbo.detach().cpu().numpy())
+    plt.plot(train_elbo)
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
@@ -582,7 +582,7 @@ def main():
                     'joint_entropy': joint_entropy,
                     'train_elbo': train_elbo,
                 }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
-                runing_dimwise_dimwise.append(dimwise_dimwise)
+                runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
                     plot_elbo(runing_dimwise_dimwise, args.save, iteration)
