@@ -438,10 +438,12 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    plt.figure(figsize=(10,10)_
-    plt.plot(train_elbo)
+    x = [i for i in range(len(train_elbo))]
+    y = [i for i in train_elbo]
+    plt.figure(figsize=(10,10))
+    plt.plot(x, y)
     fig = plt.gcf()
-    fig.savefig(os.path.join(save, 'elbo_{}.png'.format(epoch)), dpi=300)
+    fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
 
 def anneal_kl(args, vae, iteration):
