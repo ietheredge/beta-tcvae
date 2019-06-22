@@ -553,10 +553,11 @@ def main():
             elbo_running_mean.update(elbo.mean().data)
             optimizer.step()
 
-            print(train_elbo)
+            elbo_running_mean.avg
             # report training diagnostics
             if iteration % args.log_freq == 0:
                 train_elbo.append(elbo_running_mean.avg)
+                print(train_elbo)
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
                     iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.gamma,
                     elbo_running_mean.val, elbo_running_mean.avg))
