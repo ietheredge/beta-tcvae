@@ -537,9 +537,6 @@ def main():
     while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
             iteration += 1
-            if iteration == args.log_freq:
-                x_persist = x
-                
             batch_time = time.time()
             vae.train()
             anneal_kl(args, vae, iteration)
@@ -567,7 +564,7 @@ def main():
 
                 # plot training and test ELBOs
                 if args.visdom:
-                    display_samples(vae, x_persist, args.save, iteration)
+                    display_samples(vae, x, args.save, iteration)
                     plot_elbo(train_elbo, args.save, iteration)
 
                 utils.save_checkpoint({
