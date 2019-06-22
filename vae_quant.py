@@ -361,7 +361,7 @@ win_train_elbo = None
 #     xs = list(torch.cat(xs, 0).data.cpu())
 #     win_latent_walk = vis.images(xs, 7, 2, opts={'caption': 'latent walk'}, win=win_latent_walk)
 
-def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_trv_val=-2, max_trv_val=2):
+def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_trv_val=-2, max_trv_val=2):
 #     global win_samples, win_test_reco, win_latent_walk
 
     # plot random samples
