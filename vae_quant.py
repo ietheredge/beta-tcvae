@@ -438,10 +438,10 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
 #     global win_train_elbo
 #     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
 
-def plot_elbo(train_elbo):
+def plot_elbo(train_elbo, save, epoch):
     plt.plot(train_elbo.detach().cpu().numpy())
     fig = plt.gcf()
-    fig.savefig('data/training_output/elbo_{}.pdf'.format(epch), dpi=300)
+    fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch), dpi=300)
 
 
 
@@ -565,7 +565,7 @@ def main():
                 # plot training and test ELBOs
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
-                    plot_elbo(train_elbo, args.save)
+                    plot_elbo(train_elbo, args.save, iteration)
 
                 utils.save_checkpoint({
                     'state_dict': vae.state_dict(),
