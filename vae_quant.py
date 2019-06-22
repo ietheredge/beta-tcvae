@@ -572,6 +572,8 @@ def main():
                     'args': args}, args.save, iteration)
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
+                    
+                dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
                 logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
                     elbo_decomposition(vae, dataset_loader)
                 torch.save({
