@@ -534,12 +534,12 @@ def main():
     iteration = 0
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
-    x_persist = None
     while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
+            iteration += 1
             if iteration == args.log_freq:
                 x_persist = x
-            iteration += 1
+                
             batch_time = time.time()
             vae.train()
             anneal_kl(args, vae, iteration)
