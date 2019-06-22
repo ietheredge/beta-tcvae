@@ -439,7 +439,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
 #     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
 
 def plot_elbo(train_elbo, save, epoch):
-    plt.plot(train_elbo.detach().cpu().numpy())
+    plt.plot(train_elbo.cpu().numpy())
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)), dpi=300)
 
@@ -534,8 +534,11 @@ def main():
     iteration = 0
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
+    x_persist = None
     while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
+            if iteration == 0 and i == 0:
+                x_persist = x
             iteration += 1
             batch_time = time.time()
             vae.train()
@@ -564,7 +567,7 @@ def main():
 
                 # plot training and test ELBOs
                 if args.visdom:
-                    display_samples(vae, x, args.save, iteration)
+                    display_samples(vae, x_persist, args.save, iteration)
                     plot_elbo(train_elbo, args.save, iteration)
 
                 utils.save_checkpoint({
