@@ -253,7 +253,7 @@ class VAE(nn.Module):
             logpx - \
             self.alpha * (logqz_condx - logqz) - \
             self.beta * (logqz - logqz_prodmarginals) - \
-            self.lamb * (logqz_prodmarginals - logpz)
+            self.gamma * (logqz_prodmarginals - logpz)
 
         # if not self.tcvae:
         #     if self.include_mutinfo:
@@ -557,7 +557,7 @@ def main():
             if iteration % args.log_freq == 0:
                 train_elbo.append(elbo_running_mean.avg)
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
-                    iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.lamb,
+                    iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.gamma,
                     elbo_running_mean.val, elbo_running_mean.avg))
 
                 vae.eval()
