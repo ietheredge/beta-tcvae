@@ -432,18 +432,16 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'traversal_{}.png'.format(epoch)), dpi=300)
 
-
-
 # def plot_elbo(train_elbo, vis):
 #     global win_train_elbo
 #     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
 
+
 def plot_elbo(train_elbo, save, epoch):
+    plt.figure(figsize=(10,10)_
     plt.plot(train_elbo)
     fig = plt.gcf()
-    fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)), dpi=300)
-
-
+    fig.savefig(os.path.join(save, 'elbo_{}.png'.format(epoch)), dpi=300)
 
 
 def anneal_kl(args, vae, iteration):
@@ -572,7 +570,7 @@ def main():
                     'args': args}, args.save, iteration)
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
-                    
+
                 dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
                 logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
                     elbo_decomposition(vae, dataset_loader)
