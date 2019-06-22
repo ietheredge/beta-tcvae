@@ -439,7 +439,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
 #     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
 
 def plot_elbo(train_elbo, save, epoch):
-    plt.plot(train_elbo.cpu().numpy())
+    plt.plot(train_elbo)
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)), dpi=300)
 
