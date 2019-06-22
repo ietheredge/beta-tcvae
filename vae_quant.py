@@ -553,7 +553,7 @@ def main():
             elbo_running_mean.update(elbo.mean().data)
             optimizer.step()
 
-            print(elbo_running_mean.val)
+            print(elbo.data)
             # report training diagnostics
             if iteration % args.log_freq == 0:
                 train_elbo.append(elbo_running_mean.avg)
