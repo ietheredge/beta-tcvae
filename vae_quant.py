@@ -522,9 +522,9 @@ def main():
     # setup the optimizer
     optimizer = optim.Adam(vae.parameters(), lr=args.learning_rate)
 
-    # setup visdom for visualization
-    if args.visdom:
-        vis = visdom.Visdom(env=args.save, port=8097)
+    # # setup visdom for visualization
+    # if args.visdom:
+    #     vis = visdom.Visdom(env=args.save, port=8097)
 
     train_elbo = []
 
@@ -537,7 +537,7 @@ def main():
     x_persist = None
     while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
-            if iteration == 0 and i == 0:
+            if iteration == args.log_freq:
                 x_persist = x
             iteration += 1
             batch_time = time.time()
