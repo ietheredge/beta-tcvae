@@ -127,16 +127,28 @@ class ConvDecoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self, z_dim, use_cuda=False, prior_dist=dist.Normal(), q_dist=dist.Normal(),
-                 include_mutinfo=True, tcvae=False, conv=False, mss=False):
+    def __init__(self,
+            z_dim,
+            use_cuda=False,
+            prior_dist=dist.Normal(),
+            q_dist=dist.Normal(),
+            include_mutinfo=True,
+            tcvae=False,
+            conv=False,
+            mss=False,
+            alpha=1,
+            beta=1,
+            gamma=1):
         super(VAE, self).__init__()
 
         self.use_cuda = use_cuda
         self.z_dim = z_dim
         self.include_mutinfo = include_mutinfo
         self.tcvae = tcvae
-        self.lamb = 0
-        self.beta = 1
+        # self.lamb = 0
+        self.beta = beta
+        self.gamma = gamma
+        self.alpha = alpha
         self.mss = mss
         self.x_dist = dist.Bernoulli()
 
@@ -217,8 +229,8 @@ class VAE(nn.Module):
 
         elbo = logpx + logpz - logqz_condx
 
-        if self.beta == 1 and self.include_mutinfo and self.lamb == 0:
-            return elbo, elbo.detach()
+        # if self.beta == 1 and self.include_mutinfo and self.lamb == 0:
+        #     return elbo, elbo.detach()
 
         # compute log q(z) ~= log 1/(NM) sum_m=1^M q(z|x_m) = - log(MN) + logsumexp_m(q(z|x_m))
         _logqz = self.q_dist.log_density(
@@ -237,27 +249,33 @@ class VAE(nn.Module):
             logqz_prodmarginals = logsumexp(
                 logiw_matrix.view(batch_size, batch_size, 1) + _logqz, dim=1, keepdim=False).sum(1)
 
-        if not self.tcvae:
-            if self.include_mutinfo:
-                modified_elbo = logpx - self.beta * (
-                    (logqz_condx - logpz) -
-                    self.lamb * (logqz_prodmarginals - logpz)
-                )
-            else:
-                modified_elbo = logpx - self.beta * (
-                    (logqz - logqz_prodmarginals) +
-                    (1 - self.lamb) * (logqz_prodmarginals - logpz)
-                )
-        else:
-            if self.include_mutinfo:
-                modified_elbo = logpx - \
-                    (logqz_condx - logqz) - \
-                    self.beta * (logqz - logqz_prodmarginals) - \
-                    (1 - self.lamb) * (logqz_prodmarginals - logpz)
-            else:
-                modified_elbo = logpx - \
-                    self.beta * (logqz - logqz_prodmarginals) - \
-                    (1 - self.lamb) * (logqz_prodmarginals - logpz)
+        modified_elbo = \
+            logpx - \
+            self.alpha * (logqz_condx - logqz) - \
+            self.beta * (logqz - logqz_prodmarginals) - \
+            self.lamb * (logqz_prodmarginals - logpz)
+
+        # if not self.tcvae:
+        #     if self.include_mutinfo:
+        #         modified_elbo = logpx - self.beta * (
+        #             (logqz_condx - logpz) -
+        #             self.lamb * (logqz_prodmarginals - logpz)
+        #         )
+        #     else:
+        #         modified_elbo = logpx - self.beta * (
+        #             (logqz - logqz_prodmarginals) +
+        #             (1 - self.lamb) * (logqz_prodmarginals - logpz)
+        #         )
+        # else:
+        #     if self.include_mutinfo:
+        #         modified_elbo = logpx - \
+        #             (logqz_condx - logqz) - \
+        #             self.beta * (logqz - logqz_prodmarginals) - \
+        #             (1 - self.lamb) * (logqz_prodmarginals - logpz)
+        #     else:
+        #         modified_elbo = logpx - \
+        #             self.beta * (logqz - logqz_prodmarginals) - \
+        #             (1 - self.lamb) * (logqz_prodmarginals - logpz)
 
         return modified_elbo, elbo.detach()
 
@@ -457,6 +475,8 @@ def main():
     parser.add_argument('-l', '--learning-rate', default=1e-3, type=float, help='learning rate')
     parser.add_argument('-z', '--latent-dim', default=10, type=int, help='size of latent dimension')
     parser.add_argument('--beta', default=1, type=float, help='ELBO penalty term')
+    parser.add_argument('--alpha', default=1, type=float, help='ELBO penalty term')
+    parser.add_argument('--gamma', default=1, type=float, help='ELBO penalty term')
     parser.add_argument('--tcvae', action='store_true')
     parser.add_argument('--exclude-mutinfo', action='store_true')
     parser.add_argument('--beta-anneal', action='store_true')
@@ -485,8 +505,19 @@ def main():
         prior_dist = FactorialNormalizingFlow(dim=args.latent_dim, nsteps=32)
         q_dist = dist.Normal()
 
-    vae = VAE(z_dim=args.latent_dim, use_cuda=True, prior_dist=prior_dist, q_dist=q_dist,
-        include_mutinfo=not args.exclude_mutinfo, tcvae=args.tcvae, conv=args.conv, mss=args.mss)
+    vae = VAE(
+        z_dim=args.latent_dim,
+        use_cuda=True,
+        prior_dist=prior_dist,
+        q_dist=q_dist,
+        # include_mutinfo=not args.exclude_mutinfo,
+        # tcvae=args.tcvae,
+        conv=args.conv,
+        mss=args.mss,
+        alpha=args.alpha,
+        beta=args.beta,
+        gamma=args.gamma,
+        )
 
     # setup the optimizer
     optimizer = optim.Adam(vae.parameters(), lr=args.learning_rate)
@@ -525,15 +556,15 @@ def main():
             # report training diagnostics
             if iteration % args.log_freq == 0:
                 train_elbo.append(elbo_running_mean.avg)
-                print('[iteration %03d] time: %.2f \tbeta %.2f \tlambda %.2f training ELBO: %.4f (%.4f)' % (
-                    iteration, time.time() - batch_time, vae.beta, vae.lamb,
+                print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
+                    iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.lamb,
                     elbo_running_mean.val, elbo_running_mean.avg))
 
                 vae.eval()
 
                 # plot training and test ELBOs
                 if args.visdom:
-                    display_samples(vae, x, iteration, args.save)
+                    display_samples(vae, x, args.save, iteration)
                     plot_elbo(train_elbo, args.save)
 
                 utils.save_checkpoint({
@@ -541,7 +572,18 @@ def main():
                     'args': args}, args.save, iteration)
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
-    
+                logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
+                    elbo_decomposition(vae, dataset_loader)
+                torch.save({
+                    'logpx': logpx,
+                    'dependence': dependence,
+                    'information': information,
+                    'dimwise_kl': dimwise_kl,
+                    'analytical_cond_kl': analytical_cond_kl,
+                    'marginal_entropies': marginal_entropies,
+                    'joint_entropy': joint_entropy,
+                    'train_elbo': train_elbo,
+                }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
     
     # Report statistics after training
     vae.eval()
