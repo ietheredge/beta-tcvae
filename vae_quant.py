@@ -419,7 +419,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
     xs = list(torch.cat(xs, 0).data.cpu())
     print(len(xs))
-    plt.figure(figsize = (n_trv_stps, n_trv_exmp * z_dim))
+    plt.figure(figsize=(n_trv_stps, n_trv_exmp * z_dim))
     gs1 = gridspec.GridSpec(n_trv_exmp * z_dim, n_trv_stps)
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
 
@@ -534,6 +534,7 @@ def main():
     iteration = 0
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
+    runing_dimwise_dimwise = []
     while iteration <= num_iterations:
         for i, x in enumerate(train_loader):
             iteration += 1
@@ -566,10 +567,7 @@ def main():
 
                 # plot training and test ELBOs
                 
-                if args.visdom:
-                    display_samples(vae, x, args.save, iteration)
-                    plot_elbo(train_elbo, args.save, iteration)
-
+                
                 utils.save_checkpoint({
                     'state_dict': vae.state_dict(),
                     'args': args}, args.save, iteration)
@@ -577,7 +575,7 @@ def main():
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
 
                 dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
-                logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
+                logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, dimwise_dimwise = \
                     elbo_decomposition(vae, dataset_loader)
                 torch.save({
                     'logpx': logpx,
@@ -589,6 +587,11 @@ def main():
                     'joint_entropy': joint_entropy,
                     'train_elbo': train_elbo,
                 }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
+                runing_dimwise_dimwise.append(dimwise_dimwise)
+                if args.visdom:
+                    display_samples(vae, x, args.save, iteration)
+                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+
     
     # Report statistics after training
     vae.eval()

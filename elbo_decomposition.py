@@ -181,7 +181,7 @@ def elbo_decomposition(vae, dataset_loader):
     print('Analytical E_p(x)[ KL(q(z|x)||p(z)) ]: {}'.format(analytical_cond_kl))
     print('Estimated  ELBO: {}'.format(logpx - analytical_cond_kl))
 
-    return logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy
+    return logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, (- marginal_entropies + nlogpz)
 
 
 if __name__ == '__main__':
