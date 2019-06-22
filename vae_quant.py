@@ -441,7 +441,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=5, n_trv_stps=10, min_tr
 def plot_elbo(train_elbo, save, epoch):
     plt.plot(train_elbo.detach().cpu().numpy())
     fig = plt.gcf()
-    fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch), dpi=300)
+    fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)), dpi=300)
 
 
 
