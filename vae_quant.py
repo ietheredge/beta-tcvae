@@ -438,10 +438,8 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    x = [i for i in range(len(train_elbo))]
-    y = [i for i in train_elbo]
     plt.figure(figsize=(10,10))
-    plt.plot(x, y)
+    plt.plot(train_elbo)
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
