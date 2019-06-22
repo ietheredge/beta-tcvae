@@ -553,6 +553,7 @@ def main():
             elbo_running_mean.update(elbo.mean().data)
             optimizer.step()
 
+            print(train_elbo)
             # report training diagnostics
             if iteration % args.log_freq == 0:
                 train_elbo.append(elbo_running_mean.avg)
@@ -563,6 +564,7 @@ def main():
                 vae.eval()
 
                 # plot training and test ELBOs
+                
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
                     plot_elbo(train_elbo, args.save, iteration)
