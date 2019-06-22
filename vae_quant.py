@@ -586,6 +586,40 @@ def main():
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
                     plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+            if iteration == 1:
+                train_elbo.append(elbo_running_mean.avg)
+                print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
+                    iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.gamma,
+                    elbo_running_mean.val, elbo_running_mean.avg))
+
+                vae.eval()
+
+                # plot training and test ELBOs
+                
+                
+                utils.save_checkpoint({
+                    'state_dict': vae.state_dict(),
+                    'args': args}, args.save, iteration)
+                eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
+                    os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
+
+                dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
+                logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, dimwise_dimwise = \
+                    elbo_decomposition(vae, dataset_loader)
+                torch.save({
+                    'logpx': logpx,
+                    'dependence': dependence,
+                    'information': information,
+                    'dimwise_kl': dimwise_kl,
+                    'analytical_cond_kl': analytical_cond_kl,
+                    'marginal_entropies': marginal_entropies,
+                    'joint_entropy': joint_entropy,
+                    'train_elbo': train_elbo,
+                }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
+                runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
+                if args.visdom:
+                    display_samples(vae, x, args.save, iteration)
+                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
 
     
     # Report statistics after training
