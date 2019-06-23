@@ -684,7 +684,7 @@ def main():
         'state_dict': vae.state_dict(),
         'args': args}, args.save, iteration)
     dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
-    logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy = \
+    logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, dimwise_dimwise = \
         elbo_decomposition(vae, dataset_loader)
     torch.save({
         'logpx': logpx,
