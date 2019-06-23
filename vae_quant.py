@@ -444,6 +444,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 def plot_elbo(train_elbo, save, epoch):
     plt.figure(figsize=(10, 10))
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
+    train_elbo = np.array(train_elbo)
     for i, te in enumerate(train_elbo.T):
         plt.plot(te, label='f_{}'.format(i))
     plt.legend()
@@ -547,9 +548,9 @@ def main():
     elbo_running_mean = utils.RunningAverageMeter()
     runing_dimwise_dimwise = []
     while iteration <= num_iterations:
+        batch_time = time.time()
         for i, x in enumerate(train_loader):
             iteration += 1
-            batch_time = time.time()
             vae.train()
             anneal_kl(args, vae, iteration)
             optimizer.zero_grad()
