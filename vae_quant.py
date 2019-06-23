@@ -487,10 +487,9 @@ def main():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--visdom', action='store_true', help='whether plotting in visdom is desired')
     parser.add_argument('--save', default='test1')
+    parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
     args = parser.parse_args()
-
-    torch.cuda.set_device(args.gpu)
 
     # data loader
     train_loader = setup_data_loaders(args, use_cuda=True)
@@ -519,6 +518,13 @@ def main():
         beta=args.beta,
         gamma=args.gamma,
         )
+    
+    if args.multi_gpu:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+        vae = nn.DataParallel(vae)
+    else:
+        torch.cuda.set_device(args.gpu)
 
     # setup the optimizer
     optimizer = optim.Adam(vae.parameters(), lr=args.learning_rate)
@@ -588,8 +594,7 @@ def main():
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
-                    if iteration % (args.log_freq * 10) == 0:
-                        plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
             if iteration == 1:
                 train_elbo.append(elbo_running_mean.avg)
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
