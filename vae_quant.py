@@ -1,6 +1,7 @@
 import os
 import time
 import math
+from cycler import cycler
 
 from numbers import Number
 import argparse
