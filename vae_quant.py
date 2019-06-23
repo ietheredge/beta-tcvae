@@ -446,7 +446,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    cm = np.array(
+    cm = np.array([
         [203,163,231],
         [168,203,132],
         [193,177,250],
@@ -478,7 +478,7 @@ def plot_elbo(train_elbo, save, epoch):
         [214,255,204],
         [197,166,146],
         [249,255,220],
-        [174,173,140])
+        [174,173,140]])
     cm = cm/255
 
     fig = plt.figure(figsize=(10, 10))
