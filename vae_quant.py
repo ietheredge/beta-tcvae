@@ -443,7 +443,6 @@ def plot_elbo(train_elbo, save, epoch):
     for i, te in enumerate(train_elbo):
         plt.plot(te, label='f_{}'.format(i))
     plt.legend()
-    plt.show()
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
