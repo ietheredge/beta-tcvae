@@ -138,7 +138,9 @@ class VAE(nn.Module):
             mss=False,
             alpha=1,
             beta=1,
-            gamma=1):
+            gamma=1,
+            multi_gpu,
+            ):
         super(VAE, self).__init__()
 
         self.use_cuda = use_cuda
@@ -161,8 +163,10 @@ class VAE(nn.Module):
 
         # create the encoder and decoder networks
         if conv:
-            self.encoder = ConvEncoder(z_dim * self.q_dist.nparams)
-            self.decoder = ConvDecoder(z_dim)
+            if multi_gpu is True:
+                self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
+                self.decoder = nn.DataParallel(ConvDecoder(z_dim))
+                print('sending models to multiple gpus')
         else:
             self.encoder = MLPEncoder(z_dim * self.q_dist.nparams)
             self.decoder = MLPDecoder(z_dim)
@@ -490,7 +494,11 @@ def main():
     parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
     args = parser.parse_args()
-
+    
+    if args.multi_gpu:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+    else:
+        torch.cuda.set_device(args.gpu)
     # data loader
     train_loader = setup_data_loaders(args, use_cuda=True)
 
@@ -517,14 +525,10 @@ def main():
         alpha=args.alpha,
         beta=args.beta,
         gamma=args.gamma,
+        multi_gpu=args.multi_gpu,
         )
     
-    if args.multi_gpu:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-        # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-        vae = nn.DataParallel(vae)
-    else:
-        torch.cuda.set_device(args.gpu)
+    
 
     # setup the optimizer
     optimizer = optim.Adam(vae.parameters(), lr=args.learning_rate)
