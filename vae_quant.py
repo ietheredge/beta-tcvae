@@ -7,7 +7,7 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+from itertool import cycler
 import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
@@ -446,40 +446,43 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    cm = np.array([
-        [203,163,231],
-        [168,203,132],
-        [193,177,250],
-        [168,185,111],
-        [219,153,212],
-        [139,207,149],
-        [202,193,255],
-        [198,176,104],
-        [78,211,255],
-        [236,171,120],
-        [53,216,234],
-        [253,156,151],
-        [142,249,255],
-        [223,151,171],
-        [173,255,233],
-        [175,164,219],
-        [247,255,187],
-        [121,176,229],
-        [243,206,136],
-        [74,187,197],
-        [255,196,187],
-        [127,182,167],
-        [255,202,243],
-        [171,176,114],
-        [171,218,255],
-        [255,223,183],
-        [146,181,134],
-        [236,198,191],
-        [214,255,204],
-        [197,166,146],
-        [249,255,220],
-        [174,173,140]])
+    cm = np.array([[187,58,84],
+        [230,59,98],
+        [159,79,85],
+        [226,126,124],
+        [208,67,53],
+        [164,83,42],
+        [227,118,50],
+        [217,150,104],
+        [210,157,55],
+        [141,110,45],
+        [184,179,104],
+        [177,189,54],
+        [100,111,43],
+        [131,149,47],
+        [130,181,108],
+        [72,157,53],
+        [99,200,89],
+        [59,121,56],
+        [78,168,124],
+        [90,207,166],
+        [44,124,98],
+        [58,187,204],
+        [101,154,215],
+        [90,100,171],
+        [93,112,220],
+        [186,144,219],
+        [148,86,201],
+        [145,82,144],
+        [208,94,198],
+        [223,132,179],
+        [217,66,144],
+        [170,67,116]])
     cm = cm/255
+
+   
+    lines = ["-","--","-.",":"]
+    style = cycle(lines)
 
     fig = plt.figure(figsize=(10, 10))
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
@@ -488,7 +491,7 @@ def plot_elbo(train_elbo, save, epoch):
 
     train_elbo = np.array(train_elbo)
     for i, te in enumerate(train_elbo.T):
-        ax.plot(te, c=cm[i], label='f_{}'.format(i))
+        ax.plot(te, c=cm[i], ls=next(style), label='f_{}'.format(i))
     ax.legend()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
