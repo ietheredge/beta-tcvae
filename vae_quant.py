@@ -454,7 +454,7 @@ def plot_elbo(train_elbo, save, epoch):
     ax = fig.add_subplot(111)
 
     train_elbo = np.array(train_elbo)
-    colors = [cm(10.*i/len(train_elbo.T)) for i in range(len(train_elbo.T))]
+    colors = [cm(0.1*i/len(train_elbo.T)) for i in range(len(train_elbo.T))]
     for i, te in enumerate(train_elbo.T):
         ax.plot(te, c=colors[i], label='f_{}'.format(i))
     ax.legend()
