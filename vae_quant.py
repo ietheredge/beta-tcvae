@@ -1,13 +1,14 @@
 import os
 import time
 import math
-import gc
+
 from numbers import Number
 import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import visdom
+
+import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
