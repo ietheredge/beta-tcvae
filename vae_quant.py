@@ -444,7 +444,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 def plot_elbo(train_elbo, save, epoch):
     plt.figure(figsize=(10, 10))
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
-    for i, te in enumerate(train_elbo):
+    for i, te in enumerate(train_elbo.T):
         plt.plot(te, label='f_{}'.format(i))
     plt.legend()
     fig = plt.gcf()
