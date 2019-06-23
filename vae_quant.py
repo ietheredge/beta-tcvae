@@ -446,7 +446,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    cm = [[203,163,231],
+    cm = np.array([203,163,231],
 [168,203,132],
 [193,177,250],
 [168,185,111],
@@ -477,7 +477,9 @@ def plot_elbo(train_elbo, save, epoch):
 [214,255,204],
 [197,166,146],
 [249,255,220],
-[174,173,140]]
+[174,173,140])
+cm = cm/255
+
 
     fig = plt.figure(figsize=(10, 10))
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
@@ -486,7 +488,7 @@ def plot_elbo(train_elbo, save, epoch):
 
     train_elbo = np.array(train_elbo)
     for i, te in enumerate(train_elbo.T):
-        ax.plot(te, c=cm[i]/255, label='f_{}'.format(i))
+        ax.plot(te, c=cm[i], label='f_{}'.format(i))
     ax.legend()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
