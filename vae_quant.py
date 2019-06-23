@@ -7,7 +7,7 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from itertools import cycler
+from itertools import cycle
 import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
