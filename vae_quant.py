@@ -1,7 +1,6 @@
 import os
 import time
 import math
-from cycler import cycler
 
 from numbers import Number
 import argparse
@@ -453,10 +452,10 @@ def plot_elbo(train_elbo, save, epoch):
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
     
     ax = fig.add_subplot(111)
-    ax.set_prop_cycle(cycler([cm(1.*i/len(train_elbo)) for i in range(len(train_elbo))]))
+    colors = [cm(1.*i/len(train_elbo)) for i in range(len(train_elbo))]))
     train_elbo = np.array(train_elbo)
     for i, te in enumerate(train_elbo.T):
-        ax.plot(te, label='f_{}'.format(i))
+        ax.plot(te, c=colors[i], label='f_{}'.format(i))
     ax.legend()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
