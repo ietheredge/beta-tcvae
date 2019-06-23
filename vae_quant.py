@@ -446,13 +446,17 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
 
 def plot_elbo(train_elbo, save, epoch):
-    plt.figure(figsize=(10, 10))
+    cm = plt.get_cmap('gist_rainbow')
+
+    fig = plt.figure(figsize=(10, 10))
     labels = ['f_{}'.format(i) for i in range(len(train_elbo))]
-    train_elbo = np.array(train_elbo)
+    
+    ax = fig.add_subplot(111)
+    ax.set_color_cycle([cm(1.*i/len(train_elbo)) for i in range(len(train_elbo))])
+    train_elbo = np.array(train_elbo)`
     for i, te in enumerate(train_elbo.T):
-        plt.plot(te, label='f_{}'.format(i))
-    plt.legend()
-    fig = plt.gcf()
+        ax.plot(te, label='f_{}'.format(i))
+    ax.legend()
     fig.savefig(os.path.join(save, 'elbo_{}.pdf'.format(epoch)))
 
 
