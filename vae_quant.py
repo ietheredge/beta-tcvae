@@ -588,7 +588,8 @@ def main():
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
-                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+                    if iteration % (args.log_freq * 10) == 0:
+                        plot_elbo(runing_dimwise_dimwise, args.save, iteration)
             if iteration == 1:
                 train_elbo.append(elbo_running_mean.avg)
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
@@ -622,7 +623,7 @@ def main():
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
-                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+                    # plot_elbo(runing_dimwise_dimwise, args.save, iteration)
 
     
     # Report statistics after training
