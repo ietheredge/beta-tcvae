@@ -168,6 +168,9 @@ class VAE(nn.Module):
                 self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
                 self.decoder = nn.DataParallel(ConvDecoder(z_dim))
                 print('sending models to multiple gpus')
+            else:
+                self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
+                self.decoder = nn.DataParallel(ConvDecoder(z_dim))
         else:
             self.encoder = MLPEncoder(z_dim * self.q_dist.nparams)
             self.decoder = MLPDecoder(z_dim)
@@ -529,8 +532,6 @@ def main():
         gamma=args.gamma,
         multi_gpu=args.multi_gpu,
         )
-    
-    
 
     # setup the optimizer
     optimizer = optim.Adam(vae.parameters(), lr=args.learning_rate)
