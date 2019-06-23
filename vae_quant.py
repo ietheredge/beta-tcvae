@@ -139,7 +139,7 @@ class VAE(nn.Module):
             alpha=1,
             beta=1,
             gamma=1,
-            multi_gpu,
+            multi_gpu=False,
             ):
         super(VAE, self).__init__()
 
