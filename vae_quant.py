@@ -319,7 +319,7 @@ def setup_data_loaders(args, use_cuda=False):
     else:
         raise ValueError('Unknown dataset ' + str(args.dataset))
 
-    kwargs = {'num_workers': 16, 'pin_memory': use_cuda}
+    kwargs = {'num_workers': 4, 'pin_memory': use_cuda}
     train_loader = DataLoader(dataset=train_set,
         batch_size=args.batch_size, shuffle=True, **kwargs)
     return train_loader

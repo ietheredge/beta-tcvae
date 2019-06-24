@@ -54,7 +54,6 @@ class Guppies(object):
             self.dataset_zip = dataset_zip
         self.imgs = torch.from_numpy(self.dataset_zip).float()
 
-
     def __len__(self):
         return self.imgs.size(0)
 
