@@ -331,44 +331,6 @@ win_test_reco = None
 win_latent_walk = None
 win_train_elbo = None
 
-
-# def display_samples(model, x, vis):
-#     global win_samples, win_test_reco, win_latent_walk
-
-#     # plot random samples
-#     sample_mu = model.model_sample(batch_size=100).sigmoid()
-#     sample_mu = sample_mu
-#     images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
-#     win_samples = vis.images(images, 10, 2, opts={'caption': 'samples'}, win=win_samples)
-
-#     # plot the reconstructed distribution for the first 50 test images
-#     test_imgs = x[:50, :]
-#     _, reco_imgs, zs, _ = model.reconstruct_img(test_imgs)
-#     reco_imgs = reco_imgs.sigmoid()
-#     test_reco_imgs = torch.cat([
-#         test_imgs.view(x.size(1), -1, x.size(2), x.size(3)), reco_imgs.view(x.size(1), -1, x.size(2), x.size(3))], 0).transpose(0, 1)
-#     win_test_reco = vis.images(
-#         list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu()), 10, 2,
-#         opts={'caption': 'test reconstruction image'}, win=win_test_reco)
-
-#     # plot latent walks (change one variable while all others stay the same)
-#     zs = zs[0:3]
-#     batch_size, z_dim = zs.size()
-#     xs = []
-#     delta = torch.autograd.Variable(torch.linspace(-2, 2, 7), volatile=True).type_as(zs)
-#     for i in range(z_dim):
-#         vec = Variable(torch.zeros(z_dim)).view(1, z_dim).expand(7, z_dim).contiguous().type_as(zs)
-#         vec[:, i] = 1
-#         vec = vec * delta[:, None]
-#         zs_delta = zs.clone().view(batch_size, 1, z_dim)
-#         zs_delta[:, :, i] = 0
-#         zs_walk = zs_delta + vec[None]
-#         xs_walk = model.decoder.forward(zs_walk.view(-1, z_dim)).sigmoid()
-#         xs.append(xs_walk)
-
-#     xs = list(torch.cat(xs, 0).data.cpu())
-#     win_latent_walk = vis.images(xs, 7, 2, opts={'caption': 'latent walk'}, win=win_latent_walk)
-
 def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_trv_val=-2, max_trv_val=2):
 #     global win_samples, win_test_reco, win_latent_walk
 
@@ -439,11 +401,6 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
         ax1.set_aspect('equal')
     fig = plt.gcf()
     fig.savefig(os.path.join(save, 'traversal_{}.png'.format(epoch)), dpi=300)
-
-# def plot_elbo(train_elbo, vis):
-#     global win_train_elbo
-#     win_train_elbo = vis.line(torch.Tensor(train_elbo), opts={'markers': True}, win=win_train_elbo)
-
 
 def plot_elbo(train_elbo, save, epoch):
     cm = np.array([[187,58,84],
