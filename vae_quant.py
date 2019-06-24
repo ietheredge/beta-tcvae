@@ -140,7 +140,6 @@ class VAE(nn.Module):
             alpha=1,
             beta=1,
             gamma=1,
-            multi_gpu=False,
             ):
         super(VAE, self).__init__()
 
@@ -164,13 +163,13 @@ class VAE(nn.Module):
 
         # create the encoder and decoder networks
         if conv:
-            if multi_gpu is True:
-                self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
-                self.decoder = nn.DataParallel(ConvDecoder(z_dim))
-                print('sending models to multiple gpus')
-            else:
-                self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
-                self.decoder = nn.DataParallel(ConvDecoder(z_dim))
+            # if multi_gpu is True:
+            #     self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
+            #     self.decoder = nn.DataParallel(ConvDecoder(z_dim))
+            #     print('sending models to multiple gpus')
+            # else:
+            self.encoder = nn.DataParallel(ConvEncoder(z_dim * self.q_dist.nparams))
+            self.decoder = nn.DataParallel(ConvDecoder(z_dim))
         else:
             self.encoder = MLPEncoder(z_dim * self.q_dist.nparams)
             self.decoder = MLPDecoder(z_dim)
@@ -493,16 +492,13 @@ def main():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--visdom', action='store_true', help='whether plotting in visdom is desired')
     parser.add_argument('--save', default='test1')
-    parser.add_argument('--multi-gpu', action='store_true')
+    # parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
     args = parser.parse_args()
 
     os.mkdir(args.save)
     
-    if args.multi_gpu:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-    else:
-        torch.cuda.set_device(args.gpu)
+    torch.cuda.set_device(args.gpu)
     # data loader
     train_loader = setup_data_loaders(args, use_cuda=True)
 
@@ -529,7 +525,6 @@ def main():
         alpha=args.alpha,
         beta=args.beta,
         gamma=args.gamma,
-        multi_gpu=args.multi_gpu,
         )
 
     # setup the optimizer
