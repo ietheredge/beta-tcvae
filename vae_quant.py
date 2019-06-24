@@ -496,7 +496,8 @@ def main():
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
     args = parser.parse_args()
 
-    os.mkdir(args.save)
+    if not os.path.isdir(args.save):
+        os.mkdir(args.save)
     
     torch.cuda.set_device(args.gpu)
     # data loader
