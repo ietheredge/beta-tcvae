@@ -496,6 +496,8 @@ def main():
     parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
     args = parser.parse_args()
+
+    os.mkdir(args.save)
     
     if args.multi_gpu:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
