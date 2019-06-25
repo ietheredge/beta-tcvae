@@ -315,7 +315,10 @@ def setup_data_loaders(args, use_cuda=False):
     elif args.dataset == 'faces':
         train_set = dset.Faces()
     elif args.dataset == 'guppies':
-        train_set = dset.Guppies()
+        if args.data_aug:
+            train_set = dset.Guppies(aug=True)
+        else:
+            train_set = dset.Guppies(aug=False)
     else:
         raise ValueError('Unknown dataset ' + str(args.dataset))
 
@@ -491,6 +494,7 @@ def main():
     parser.add_argument('--save', default='test1')
     # parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
+    parser.add_argument('--data_aug', action='store_true')
     args = parser.parse_args()
 
     if not os.path.isdir(args.save):
