@@ -46,12 +46,22 @@ class Faces(Dataset):
 
 class Guppies(object):
 
-    def __init__(self, dataset_zip=None):
+    def __init__(self, dataset_zip=None, aug=true):
         loc = 'data/guppies.npy'
         if dataset_zip is None:
                 self.dataset_zip = np.load(loc, encoding='latin1')
         else:
             self.dataset_zip = dataset_zip
+        self.aug = aug
+        self.trans = transforms.Compose([
+            transforms.RandomRotation(5),
+            transforms.RandomAffine(
+                0,
+                translate=(0.2, 0.3),
+                scale=(0.5, 1.5),
+                ),
+            transforms.RandomHorizontalFlip(p=0.5)
+        ])
         self.imgs = torch.from_numpy(self.dataset_zip).float()
 
     def __len__(self):
@@ -59,4 +69,6 @@ class Guppies(object):
 
     def __getitem__(self, index):
         x = self.imgs[index].view(256, 256, 3).permute(2, 0, 1)
+        if self.aug:
+            x = self.trans(x)
         return x
