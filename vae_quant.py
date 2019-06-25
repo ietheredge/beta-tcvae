@@ -647,6 +647,7 @@ def main():
         'marginal_entropies': marginal_entropies,
         'joint_entropy': joint_entropy,
         'train_elbo': train_elbo,
+        'running_dimwise': runing_dimwise_dimwise,
     }, os.path.join(args.save, 'elbo_decomposition.pth'))
     eval('plot_vs_gt_' + args.dataset)(vae, dataset_loader.dataset, os.path.join(args.save, 'gt_vs_latent.png'))
     return vae
