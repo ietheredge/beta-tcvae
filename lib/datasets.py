@@ -70,5 +70,5 @@ class Guppies(object):
     def __getitem__(self, index):
         x = self.imgs[index].view(256, 256, 3).permute(2, 0, 1)
         if self.aug:
-            x = self.trans()(transforms.ToPILImage()(x))
+            x = self.trans()(transforms.ToPILImage(x))
         return x
