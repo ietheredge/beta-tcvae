@@ -343,7 +343,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
     for i, image in enumerate(images):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = fig.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
@@ -362,7 +362,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
     for i, image in enumerate(test_reco_imgs):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = fig.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
@@ -392,7 +392,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
     for i, image in enumerate(xs):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = fig.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
