@@ -46,7 +46,7 @@ class Faces(Dataset):
 
 class Guppies(object):
 
-    def __init__(self, dataset_zip=None, aug=true):
+    def __init__(self, dataset_zip=None, aug=True):
         loc = 'data/guppies.npy'
         if dataset_zip is None:
                 self.dataset_zip = np.load(loc, encoding='latin1')
