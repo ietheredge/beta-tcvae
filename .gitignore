@@ -5,3 +5,4 @@ data
 *.pdf
 beta-tcvae-torch.code-workspace
 models
+.vscode/settings.json
