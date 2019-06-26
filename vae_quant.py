@@ -315,11 +315,14 @@ def setup_data_loaders(args, use_cuda=False):
     elif args.dataset == 'faces':
         train_set = dset.Faces()
     elif args.dataset == 'guppies':
-        train_set = dset.Guppies()
+        if args.data_aug:
+            train_set = dset.Guppies(aug=True)
+        else:
+            train_set = dset.Guppies(aug=False)
     else:
         raise ValueError('Unknown dataset ' + str(args.dataset))
 
-    kwargs = {'num_workers': 16, 'pin_memory': use_cuda}
+    kwargs = {'num_workers': 4, 'pin_memory': use_cuda}
     train_loader = DataLoader(dataset=train_set,
         batch_size=args.batch_size, shuffle=True, **kwargs)
     return train_loader
@@ -338,16 +341,15 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     sample_mu = sample_mu
     images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
     
-    plt.figure(figsize = (10,10))
+    fig = plt.figure(figsize=(10,10))
     gs1 = gridspec.GridSpec(10, 10)
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
     for i, image in enumerate(images):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = plt.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
-    fig = plt.gcf()
     fig.savefig(os.path.join(save, 'samples_{}.png'.format(epoch)), dpi=300)
 
     # plot the reconstructed distribution for the first 50 test images
@@ -358,16 +360,15 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
         test_imgs.view(-1, x.size(1),  x.size(2), x.size(3)), reco_imgs.view(-1, x.size(1),  x.size(2), x.size(3))], 1)
     test_reco_imgs = list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
     
-    plt.figure(figsize = (10, 10))
+    fig = plt.figure(figsize=(10, 10))
     gs1 = gridspec.GridSpec(10, 10)
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
     for i, image in enumerate(test_reco_imgs):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = plt.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
-    fig = plt.gcf()
     fig.savefig(os.path.join(save, 'reconstruction_{}.png'.format(epoch)), dpi=300)
     
     # plot latent walks (change one variable while all others stay the same)
@@ -388,17 +389,16 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
 
     xs = list(torch.cat(xs, 0).data.cpu())
     print(len(xs))
-    plt.figure(figsize=(n_trv_stps, n_trv_exmp * z_dim))
+    fig =  plt.figure(figsize=(n_trv_stps, n_trv_exmp * z_dim))
     gs1 = gridspec.GridSpec(n_trv_exmp * z_dim, n_trv_stps)
     gs1.update(wspace=0., hspace=0.) # set the spacing between axes. 
 
     for i, image in enumerate(xs):
        # i = i + 1 # grid spec indexes from 0
-        ax1 = plt.subplot(gs1[i])
+        ax1 = fig.add_subplot(gs1[i])
         ax1.imshow(image.permute(1, 2, 0).detach().cpu().numpy())
         plt.axis('off')
         ax1.set_aspect('equal')
-    fig = plt.gcf()
     fig.savefig(os.path.join(save, 'traversal_{}.png'.format(epoch)), dpi=300)
 
 def plot_elbo(train_elbo, save, epoch):
@@ -494,6 +494,7 @@ def main():
     parser.add_argument('--save', default='test1')
     # parser.add_argument('--multi-gpu', action='store_true')
     parser.add_argument('--log_freq', default=200, type=int, help='num iterations per log')
+    parser.add_argument('--data_aug', action='store_true')
     args = parser.parse_args()
 
     if not os.path.isdir(args.save):
@@ -650,6 +651,7 @@ def main():
         'marginal_entropies': marginal_entropies,
         'joint_entropy': joint_entropy,
         'train_elbo': train_elbo,
+        'running_dimwise': runing_dimwise_dimwise,
     }, os.path.join(args.save, 'elbo_decomposition.pth'))
     eval('plot_vs_gt_' + args.dataset)(vae, dataset_loader.dataset, os.path.join(args.save, 'gt_vs_latent.png'))
     return vae
