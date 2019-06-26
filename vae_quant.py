@@ -1,6 +1,7 @@
 import os
 import time
 import math
+import gc
 
 from numbers import Number
 import argparse
@@ -322,7 +323,7 @@ def setup_data_loaders(args, use_cuda=False):
     else:
         raise ValueError('Unknown dataset ' + str(args.dataset))
 
-    kwargs = {'num_workers': 4, 'pin_memory': use_cuda}
+    kwargs = {'num_workers': 0, 'pin_memory': use_cuda}
     train_loader = DataLoader(dataset=train_set,
         batch_size=args.batch_size, shuffle=True, **kwargs)
     return train_loader
@@ -598,6 +599,7 @@ def main():
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
                     plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+
             if iteration == 1:
                 train_elbo.append(elbo_running_mean.avg)
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
@@ -615,7 +617,7 @@ def main():
                 eval('plot_vs_gt_' + args.dataset)(vae, train_loader.dataset,
                     os.path.join(args.save, 'gt_vs_latent_{:05d}.png'.format(iteration)))
 
-                dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
+                dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=0, shuffle=False)
                 logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, dimwise_dimwise = \
                     elbo_decomposition(vae, dataset_loader)
                 torch.save({
@@ -633,13 +635,16 @@ def main():
                     display_samples(vae, x, args.save, iteration)
                     # plot_elbo(runing_dimwise_dimwise, args.save, iteration)
 
+        torch.cuda.empty_cache()
+        gc.collect()
+
     
     # Report statistics after training
     vae.eval()
     utils.save_checkpoint({
         'state_dict': vae.state_dict(),
         'args': args}, args.save, iteration)
-    dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=1, shuffle=False)
+    dataset_loader = DataLoader(train_loader.dataset, batch_size=10, num_workers=0, shuffle=False)
     logpx, dependence, information, dimwise_kl, analytical_cond_kl, marginal_entropies, joint_entropy, dimwise_dimwise = \
         elbo_decomposition(vae, dataset_loader)
     torch.save({
