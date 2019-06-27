@@ -340,7 +340,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     # plot random samples
     sample_mu = model.model_sample(batch_size=100).sigmoid()
     sample_mu = sample_mu
-    images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).detach.cpu())
+    images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
     
     fig = plt.figure(figsize=(10,10))
     gs1 = gridspec.GridSpec(10, 10)
@@ -359,7 +359,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     reco_imgs = reco_imgs.sigmoid()
     test_reco_imgs = torch.cat([
         test_imgs.view(-1, x.size(1),  x.size(2), x.size(3)), reco_imgs.view(-1, x.size(1),  x.size(2), x.size(3))], 1)
-    test_reco_imgs = list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).detach.cpu())
+    test_reco_imgs = list(test_reco_imgs.contiguous().view(-1, x.size(1), x.size(2), x.size(3)).detach().cpu())
     
     fig = plt.figure(figsize=(10, 10))
     gs1 = gridspec.GridSpec(10, 10)
