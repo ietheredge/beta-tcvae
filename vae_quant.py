@@ -546,7 +546,6 @@ def main():
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
     runing_dimwise_dimwise = []
-    data_noloader = 
     while iteration <= num_iterations:
         batch_time = time.time()
         for i, x in enumerate(train_loader):
