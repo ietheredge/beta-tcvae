@@ -596,9 +596,9 @@ def main():
                     'train_elbo': train_elbo,
                 }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
-                if args.visdom:
-                    display_samples(vae, x, args.save, iteration)
-                    plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+                # if args.visdom:
+                #     display_samples(vae, x, args.save, iteration)
+                #     plot_elbo(runing_dimwise_dimwise, args.save, iteration)
 
             if iteration == 1:
                 train_elbo.append(elbo_running_mean.avg.detach())
@@ -631,9 +631,9 @@ def main():
                     'train_elbo': train_elbo,
                 }, os.path.join(args.save, 'elbo_decomposition{0:05d}.pth'.format(iteration)))
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
-                if args.visdom:
-                    display_samples(vae, x, args.save, iteration)
-                    # plot_elbo(runing_dimwise_dimwise, args.save, iteration)
+                # if args.visdom:
+                #     display_samples(vae, x, args.save, iteration)
+                #     # plot_elbo(runing_dimwise_dimwise, args.save, iteration)
 
         torch.cuda.empty_cache()
         gc.collect()
