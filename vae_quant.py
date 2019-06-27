@@ -340,7 +340,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
     # plot random samples
     sample_mu = model.model_sample(batch_size=100).sigmoid()
     sample_mu = sample_mu
-    images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).data.cpu())
+    images = list(sample_mu.view(-1, x.size(1), x.size(2), x.size(3)).detach().cpu())
     
     fig = plt.figure(figsize=(10,10))
     gs1 = gridspec.GridSpec(10, 10)
@@ -388,7 +388,7 @@ def display_samples(model, x, save, epoch=0, n_trv_exmp=3, n_trv_stps=10, min_tr
         xs_walk = model.decoder.forward(zs_walk.view(-1, z_dim)).sigmoid()
         xs.append(xs_walk)
 
-    xs = list(torch.cat(xs, 0).data.cpu())
+    xs = list(torch.cat(xs, 0).detach().cpu())
     print(len(xs))
     fig =  plt.figure(figsize=(n_trv_stps, n_trv_exmp * z_dim))
     gs1 = gridspec.GridSpec(n_trv_exmp * z_dim, n_trv_stps)
@@ -566,10 +566,10 @@ def main():
             optimizer.step()
             # report training diagnostics
             if iteration % args.log_freq == 0:
-                train_elbo.append(elbo_running_mean.avg.item())
+                train_elbo.append(elbo_running_mean.avg.detach())
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
                     iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.gamma,
-                    elbo_running_mean.val.item(), elbo_running_mean.avg.item()))
+                    elbo_running_mean.val.detach(), elbo_running_mean.avg.detach()))
 
                 vae.eval()
 
