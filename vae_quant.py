@@ -546,6 +546,7 @@ def main():
     # initialize loss accumulator
     elbo_running_mean = utils.RunningAverageMeter()
     runing_dimwise_dimwise = []
+    data_noloader = 
     while iteration <= num_iterations:
         batch_time = time.time()
         for i, x in enumerate(train_loader):
@@ -562,14 +563,14 @@ def main():
             if utils.isnan(obj).any():
                 raise ValueError('NaN spotted in objective.')
             obj.mean().mul(-1).backward()
-            elbo_running_mean.update(elbo.mean().data)
+            elbo_running_mean.update(elbo.mean().detach())
             optimizer.step()
             # report training diagnostics
             if iteration % args.log_freq == 0:
-                train_elbo.append(elbo_running_mean.avg)
+                train_elbo.append(elbo_running_mean.avg.item())
                 print('[iteration %03d] time: %.2f \talpha %.2f \tbeta %.2f \tgamma %.2f training ELBO: %.4f (%.4f)' % (
                     iteration, time.time() - batch_time, vae.alpha, vae.beta, vae.gamma,
-                    elbo_running_mean.val, elbo_running_mean.avg))
+                    elbo_running_mean.val.item(), elbo_running_mean.avg.item()))
 
                 vae.eval()
 
@@ -629,7 +630,7 @@ def main():
                     'marginal_entropies': marginal_entropies,
                     'joint_entropy': joint_entropy,
                     'train_elbo': train_elbo,
-                }, os.path.join(args.save, 'elbo_decomposition{}.pth'.format(iteration)))
+                }, os.path.join(args.save, 'elbo_decomposition{0:05d}.pth'.format(iteration)))
                 runing_dimwise_dimwise.append(dimwise_dimwise.detach().cpu().numpy())
                 if args.visdom:
                     display_samples(vae, x, args.save, iteration)
